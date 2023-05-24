@@ -7,7 +7,11 @@ public class Message implements Serializable{
     private MessageType typeMessage; //тип повідомлення
     private String textMessage; //текст повідомлення
     private Set<String> listUsers; //множина імен користувачів у чаті
-
+    public Message(MessageType typeMessage, String textMessage, Set<String> listUsers){
+        this.typeMessage = typeMessage;
+        this.textMessage = textMessage;
+        this.listUsers = listUsers;
+    }
     public MessageType getTypeMessage(){
         return typeMessage;
     }
