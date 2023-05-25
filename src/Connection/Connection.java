@@ -13,7 +13,19 @@ public class Connection implements Closeable{
         this.in = new ObjectInputStream(socket.getInputStream());
         this.out = new ObjectOutputStream(socket.getOutputStream());
     }
-
+    //Відправка по сокету повідомлення
+    public void send(Message message) throws IOException {
+        synchronized (this.out){
+            out.writeObject(message);
+        }
+    }
+    //Прийняття по сокету повідомлення
+    public Message receive() throws IOException, ClassNotFoundException {
+        synchronized (this.in){
+            Message message = (Message) in.readObject();
+            return message;
+        }
+    }
     //Для закріття потоків читання, запису та сокету
     @Override
     public void close() throws IOException{
