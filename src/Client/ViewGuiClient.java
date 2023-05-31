@@ -57,17 +57,46 @@ public class ViewGuiClient {
         while(true) {
             String addressServer = JOptionPane.showInputDialog(
                     frame, "Enter server address: ",
-                    "Enter Server Address",
+                    "Enter server address",
                     JOptionPane.QUESTION_MESSAGE
             );
             return addressServer.trim();
         }
     }
 
+    //виклик вікна для вводу порта сервера
+    protected int getPortServer(){
+        while(true) {
+            String port = JOptionPane.showInputDialog(
+                    frame, "Enter server port: ",
+                    "Enter server port",
+                    JOptionPane.QUESTION_MESSAGE
+            );
 
+            try {
+                return Integer.parseInt(port.trim());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(
+                        frame, "Incorrect server port entered. Try again",
+                        "Server port input error", JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
 
+    protected String getNameUser() {
+        String name = JOptionPane.showInputDialog(
+                frame, "Input user name: ",
+                "Input User name",
+                JOptionPane.QUESTION_MESSAGE
+        );
 
+        return name;
+    }
 
-
+    protected void errorDialogWindow(String text) {
+        JOptionPane.showMessageDialog(
+                frame, text, "Error", JOptionPane.ERROR_MESSAGE);
+    }
 
 }
