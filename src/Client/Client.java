@@ -11,7 +11,6 @@ public class Client {
     private static ModelGuiClient model;
     private static ViewGuiClient gui;
     private boolean isConnect = false; //прапор стану підключення клієнта
-
     public boolean isConnect() {
         return isConnect;
     }
@@ -30,6 +29,30 @@ public class Client {
             if(client.isConnect()) {
                 client.setConnect(false);
             }
+        }
+    }
+
+    protected void connectToServer() {
+        //Якщо клієнт ще не підключений
+        if(!isConnect) {
+            while(true) {
+                try {
+                    //
+                    String addressServer = gui.getServerAddress();
+                    int port = gui.getPortServer();
+
+                    Socket socket = new Socket(addressServer, port);
+                    connection = new Connection(socket);
+                    isConnect = true;
+                    gui.addMessage("You are connected to the Server!\n");
+                    break;
+                } catch (Exception e) {
+                    gui.errorDialogWindow("An error has occurred! You may have entered the wrong server address and port. Try again");
+                    break;
+                }
+            }
+        } else {
+            gui.errorDialogWindow("You are already connected");
         }
     }
 
