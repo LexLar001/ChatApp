@@ -12,6 +12,11 @@ public class Message implements Serializable{
         this.textMessage = textMessage;
         this.listUsers = listUsers;
     }
+    public Message(MessageType typeMessage, String textMessage){
+        this.typeMessage = typeMessage;
+        this.textMessage = textMessage;
+        this.listUsers = null;
+    }
     public MessageType getTypeMessage(){
         return typeMessage;
     }
