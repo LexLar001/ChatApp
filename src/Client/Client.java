@@ -11,6 +11,7 @@ public class Client {
     private static ModelGuiClient model;
     private static ViewGuiClient gui;
     private boolean isConnect = false; //прапор стану підключення клієнта
+
     public boolean isConnect() {
         return isConnect;
     }
@@ -27,6 +28,8 @@ public class Client {
 
         while (true) {
             if(client.isConnect()) {
+                client.nameUserRegistration();
+                client.receiveMessageFromServer();
                 client.setConnect(false);
             }
         }
@@ -44,7 +47,7 @@ public class Client {
                     Socket socket = new Socket(addressServer, port);
                     connection = new Connection(socket);
                     isConnect = true;
-                    gui.addMessage("You are connected to the Server!\n");
+                    gui.addMessage("Message: you are connected to the Server!\n");
                     break;
                 } catch (Exception e) {
                     gui.errorDialogWindow("An error has occurred! You may have entered the wrong server address and port. Try again");
@@ -52,7 +55,7 @@ public class Client {
                 }
             }
         } else {
-            gui.errorDialogWindow("You are already connected");
+            gui.errorDialogWindow("You are already connected!");
         }
     }
 
@@ -73,7 +76,7 @@ public class Client {
                 }
                 //якщо ім'я прийнято, отримуємо список користувачів та виводимо його
                 if (message.getTypeMessage() == MessageType.NAME_ACCEPTED){
-                    gui.addMessage("Your name is taken!");
+                    gui.addMessage("Message: your name is taken!");
                     model.setUsers(message.getListUsers());
                     break;
                 }
@@ -100,7 +103,52 @@ public class Client {
         }
     }
 
+    //метод, який приймає повідомлення інших з сервера
+    protected void receiveMessageFromServer() {
+        while (isConnect) {
+            try{
+                Message message = connection.receive();
 
+                //якщо тип TEXT_MESSAGE, то додаємо повідомлення у вікно
+                if (message.getTypeMessage() == MessageType.TEXT_MESSAGE) {
+                    gui.addMessage(message.getTextMessage());
+                }
 
+                //якщо тип USER_ADDED, додаємо інфу про нового користувача
+                if (message.getTypeMessage() == MessageType.USER_ADDED) {
+                    model.addUser(message.getTextMessage());
+                    gui.refreshListUsers(model.getUsers());
+                    gui.addMessage(String.format("Message: user has %s joined the chat.\n", message.getTextMessage()));
+                }
+                //якщо тип USER_REMOVED, видаляємо користувача зі списку
+                if (message.getTypeMessage() == MessageType.USER_REMOVED) {
+                    model.removeUser(message.getTextMessage());
+                    gui.refreshListUsers(model.getUsers());
+                    gui.addMessage(String.format("Message: user %s has left the chat.\n", message.getTextMessage()));
+                }
+            } catch (Exception e) {
+                gui.errorDialogWindow("Error while receiving message from server");
+                setConnect(false);
+                gui.refreshListUsers(model.getUsers());
+                break;
+            }
+        }
+    }
+
+    //метод, який реалізує відключення клієнта від чату
+    protected void disableClient() {
+        try {
+            if(isConnect) {
+                connection.send(new Message(MessageType.DISABLE_USER));
+                model.getUsers().clear();
+                isConnect = false;
+                gui.refreshListUsers(model.getUsers());
+            } else {
+                gui.errorDialogWindow("You are already disabled");
+            }
+        } catch (Exception e) {
+            gui.errorDialogWindow("Message: an error occurred while disconnecting");
+        }
+    }
 }
 

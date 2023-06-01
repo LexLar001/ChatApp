@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Set;
 
@@ -34,6 +35,26 @@ public class ViewGuiClient {
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+        //якщо вікно зі сторони сервера закривається
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (client.isConnect()) {
+                    client.disableClient();
+                }
+                System.exit(0);
+            }
+        });
+
+        frame.setVisible(true);
+
+        buttonDisable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.disableClient();
+            }
+        });
+
         buttonConnect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -41,6 +62,13 @@ public class ViewGuiClient {
             }
         });
 
+        textField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                client.sendMessageOnServer(textField.getText());
+                textField.setText("");
+            }
+        });
     }
 
     //додаємо текст до поля
