@@ -33,4 +33,23 @@ public class ViewGuiServer {
     public void refreshDialogWindowServer(String serviceMessage) {
         dialogWindow.append(serviceMessage);
     }
+
+    protected int getPortServer() {
+        while (true) {
+            String port = JOptionPane.showInputDialog(
+                    frame, "Enter server port: ",
+                    "Enter server port",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            try {
+                return Integer.parseInt(port.trim());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(
+                        frame, "Incorrect server port entered. Try again",
+                        "Server port input error", JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
 }
