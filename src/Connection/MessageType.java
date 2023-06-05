@@ -9,6 +9,5 @@ public enum MessageType {
     TEXT_MESSAGE,
     USER_ADDED,
     USER_REMOVED,
-    DISABLE_USER
-
+    DISABLE_USER;
 }

@@ -3,7 +3,7 @@ package Connection;
 import java.io.*;
 import java.net.Socket;
 
-public class Connection implements Closeable{
+public class Connection implements Closeable {
     private final Socket socket;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;

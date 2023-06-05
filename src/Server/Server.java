@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 
 public class Server {
@@ -14,7 +15,7 @@ public class Server {
     private ServerSocket serverSocket;
     private static ViewGuiServer gui;
     private static ModelGuiServer model;
-    private static boolean isServerStart = false; //прапор для стану сервера
+    private static volatile boolean isServerStart = false; //прапор для стану сервера
 
     //метод, який запускає сервер
     protected void startServer(int port) {
@@ -50,7 +51,15 @@ public class Server {
 
     //метод, в якому сервер приймає нові сокетні підключення від клієнта
     protected void acceptServer() {
-        //
+        while (true) {
+            try {
+                Socket socket = serverSocket.accept();
+                new ServerThread(socket).start();
+            } catch (Exception e) {
+                gui.refreshDialogWindowServer("The connection to the server has been lost.\n");
+                break;
+            }
+        }
     }
 
     //метод, який розсилає повідомлення всім користувачам з мапи
@@ -121,17 +130,45 @@ public class Server {
             }
         }
 
+        //метод, який реалізує обмін повідомленнями між користувачами
+        private void messagingBetweenUsers (Connection connection, String userName) {
+            while (true) {
+                try {
+                    Message message = connection.receive();
+                    //прийняли повідомлення клієнта
+                    //якщо це текстове повідомлення, то надсилаємо всім
+                    if (message.getTypeMessage() == MessageType.TEXT_MESSAGE) {
+                        String textMessage = String.format("%s: %s\n", userName, message.getTextMessage());
+                        sendMessageAllUsers(new Message(MessageType.TEXT_MESSAGE, textMessage));
+                    }
+                    //якщо клієнт відключився, надсилаєм користувачам повідомлення
+                    //видаляємо з мапи та закриваємо connection
+                    if (message.getTypeMessage() == MessageType.DISABLE_USER) {
+                        sendMessageAllUsers(new Message(MessageType.DISABLE_USER, userName));
+                        model.removeUser(userName);
+                        connection.close();
+                        gui.refreshDialogWindowServer(String.format("User %s has logged out.\n", socket.getRemoteSocketAddress()));
+                        break;
+                    }
+                } catch (Exception e) {
+                    gui.refreshDialogWindowServer(String.format("An error occurred while sending a message from user %s, or disconnected!\n", userName));
+                    break;
+                }
+            }
+        }
 
+        @Override
+        public void run(){
+            gui.refreshDialogWindowServer(String.format("New user connected with remote socket - %s.\n", socket.getRemoteSocketAddress()));
+            try {
+                //отримуємо connection за допомогою сокета від клієнта та запитуємо ім'я
+                //запускаємо цикл обміну повідомлень між клієнтами
+                Connection connection = new Connection(socket);
+                String nameUser = requestAndAddingUser(connection);
+                messagingBetweenUsers(connection, nameUser);
+            } catch (Exception e) {
+                gui.refreshDialogWindowServer("An error occurred while sending a message from the user!\n");
+            }
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
 }

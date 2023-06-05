@@ -1,6 +1,6 @@
 package Server;
 
-import Connection.*;
+import Connection.Connection;
 
 import java.util.HashMap;
 import java.util.Map;

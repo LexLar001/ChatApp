@@ -121,13 +121,11 @@ public class ViewGuiClient {
     }
 
     protected String getNameUser() {
-        String name = JOptionPane.showInputDialog(
+        return JOptionPane.showInputDialog(
                 frame, "Input user name: ",
                 "Input User name",
                 JOptionPane.QUESTION_MESSAGE
         );
-
-        return name;
     }
 
     protected void errorDialogWindow(String text) {

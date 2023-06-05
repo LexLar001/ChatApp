@@ -10,7 +10,7 @@ public class Client {
     private Connection connection;
     private static ModelGuiClient model;
     private static ViewGuiClient gui;
-    private boolean isConnect = false; //прапор стану підключення клієнта
+    private volatile boolean isConnect = false; //прапор стану підключення клієнта
 
     public boolean isConnect() {
         return isConnect;
