@@ -4,7 +4,9 @@ import Connection.*;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class Server {
@@ -77,8 +79,50 @@ public class Server {
         }
     }
 
-    //клас-потік, який запускається, коли сервер приймає сокет нового клієнта
-    //
+    //клас-потік, який запускається, коли сервер приймає сокет нового клієнта(передаємо сокет )
+    private class ServerThread extends Thread {
+
+        private Socket socket;
+
+        public ServerThread (Socket socket) {
+            this.socket = socket;
+        }
+
+        //метод запиту у клієнта ім'я та додавання в мапу сервером
+        private String requestAndAddingUser (Connection connection) {
+            while(true){
+                try {
+                    //посилаємо клієнту запит на ім'я
+                    connection.send(new Message(MessageType.REQUEST_NAME_USER));
+                    Message responceMessage = connection.receive();
+                    String userName = responceMessage.getTextMessage();
+                    //перевірка чи не зайняте ім'я
+                    if(responceMessage.getTypeMessage() == MessageType.USER_NAME &&
+                       userName != null && !userName.isEmpty() &&
+                       !model.getAllUsersMultiChat().containsKey(userName)) {
+                        //додаємо ім'я в мапу
+                        model.addUser(userName, connection);
+                        Set<String> listUsers = new HashSet<>();
+                        for(Map.Entry<String, Connection> users : model.getAllUsersMultiChat().entrySet()) {
+                            listUsers.add(users.getKey());
+                        }
+                        //відправляємо множину імен користувачів для клієнта
+                        connection.send(new Message(MessageType.NAME_ACCEPTED, listUsers));
+                        //відправляємо всім клієнтам повідомлення про нового користувача
+                        sendMessageAllUsers(new Message(MessageType.USER_ADDED, userName));
+                        return userName;
+                    } else {
+                        //якщо ім'я вже зайнято, надсилаємо повідомлення клієнту
+                        connection.send(new Message(MessageType.NAME_USED));
+                    }
+                } catch (Exception e) {
+                    gui.refreshDialogWindowServer("An error occurred while requesting and adding a new user\n");
+                }
+            }
+        }
+
+
+    }
 
 
 
