@@ -23,5 +23,4 @@ public class ModelGuiClient {
     protected void removeUser (String nameUser) {
         users.remove(nameUser);
     }
-
 }

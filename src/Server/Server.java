@@ -144,7 +144,7 @@ public class Server {
                     //якщо клієнт відключився, надсилаєм користувачам повідомлення
                     //видаляємо з мапи та закриваємо connection
                     if (message.getTypeMessage() == MessageType.DISABLE_USER) {
-                        sendMessageAllUsers(new Message(MessageType.DISABLE_USER, userName));
+                        sendMessageAllUsers(new Message(MessageType.USER_REMOVED, userName));
                         model.removeUser(userName);
                         connection.close();
                         gui.refreshDialogWindowServer(String.format("User %s has logged out.\n", socket.getRemoteSocketAddress()));

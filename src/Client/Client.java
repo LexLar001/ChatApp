@@ -76,7 +76,7 @@ public class Client {
                 }
                 //якщо ім'я прийнято, отримуємо список користувачів та виводимо його
                 if (message.getTypeMessage() == MessageType.NAME_ACCEPTED){
-                    gui.addMessage("Message: your name is taken!");
+                    gui.addMessage("Message: your name is taken!\n");
                     model.setUsers(message.getListUsers());
                     break;
                 }

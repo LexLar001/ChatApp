@@ -10,8 +10,8 @@ public class Connection implements Closeable {
 
     public Connection(Socket socket) throws IOException {
         this.socket = socket;
-        this.in = new ObjectInputStream(socket.getInputStream());
         this.out = new ObjectOutputStream(socket.getOutputStream());
+        this.in = new ObjectInputStream(socket.getInputStream());
     }
     //Відправка по сокету повідомлення
     public void send(Message message) throws IOException {
